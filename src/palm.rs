@@ -1,6 +1,13 @@
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::io::Read;
 
 const ENDPOINT: &str = "https://generativelanguage.googleapis.com";
+
+#[derive(Serialize, Deserialize, Debug)]
+struct ListRes {
+    models: Vec<HashMap<String, String>>,
+}
 
 pub struct PalmClient {
     api_key: String,
@@ -8,16 +15,20 @@ pub struct PalmClient {
 }
 
 impl PalmClient {
-    pub fn list_models(&self) -> Result<(), Box<dyn std::error::Error>> {
+    fn fetch_models(&self) -> Result<String, Box<dyn std::error::Error>> {
         let mut res = reqwest::blocking::get(format!(
             "{}/v1beta2/models?key={}",
             self.endpoint, self.api_key
         ))?;
         let mut body = String::new();
         res.read_to_string(&mut body)?;
-
+        Ok(body)
+    }
+    pub fn list_models(&self) -> serde_json::Result<()> {
+        let body = self.fetch_models().expect("msg");
         println!("{}",body);
-
+        // let parsed_body = serde_json::from_str(&body.as_str())?;
+        // println!("{}",parsed_body.models.len());
         Ok(())
     }
 }
