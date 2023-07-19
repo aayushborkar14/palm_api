@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, io::Read};
+use std::io::Read;
 
 const ENDPOINT: &str = "https://generativelanguage.googleapis.com";
 
@@ -73,7 +73,7 @@ struct EmbedValue {
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct ChatBody {
+pub struct ChatBody {
     prompt: MessagePrompt,
     temperature: f64,
     candidate_count: u32,
@@ -88,7 +88,7 @@ struct Example {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct MessagePrompt {
+struct MessagePrompt {
     context: String,
     examples: Vec<Example>,
     messages: Vec<Message>,
@@ -378,53 +378,18 @@ impl PalmClient {
     fn post_chat_req(
         &self,
         model: &String,
-        message_prompt: MessagePrompt,
-        config: HashMap<String, String>,
+        mut chat_body: ChatBody,
     ) -> Result<(reqwest::blocking::Response, String), Box<dyn std::error::Error>> {
-        let temperature: f64;
-        let candidate_count: u32;
-        let top_p: f64;
-        let top_k: i32;
         let model_info = self.get_model(model.to_string()).expect("err");
-        if config.contains_key(&"temperature".to_string()) {
-            temperature = match config["temperature"].trim().parse() {
-                Ok(num) => num,
-                Err(_) => return Err("Invalid temperature".into()),
-            };
-        } else {
-            temperature = model_info.temperature.unwrap();
+        if chat_body.temperature == -1.0 {
+            chat_body.temperature = model_info.temperature.unwrap();
         }
-        if config.contains_key(&"candidate_count".to_string()) {
-            candidate_count = match config["candidate_count"].trim().parse() {
-                Ok(num) => num,
-                Err(_) => return Err("Invalid Candidate Count".into()),
-            };
-        } else {
-            candidate_count = 1;
+        if chat_body.top_p == -1.0 {
+            chat_body.top_p = model_info.top_p.unwrap();
         }
-        if config.contains_key(&"top_p".to_string()) {
-            top_p = match config["top_p"].trim().parse() {
-                Ok(num) => num,
-                Err(_) => return Err("Invalid top_p".into()),
-            };
-        } else {
-            top_p = model_info.top_p.unwrap();
+        if chat_body.top_k == -1 {
+            chat_body.top_k = model_info.top_k.unwrap();
         }
-        if config.contains_key(&"top_k".to_string()) {
-            top_k = match config["top_k"].trim().parse() {
-                Ok(num) => num,
-                Err(_) => return Err("Invalid top_k".into()),
-            };
-        } else {
-            top_k = model_info.top_k.unwrap();
-        }
-        let chat_body = ChatBody {
-            prompt: message_prompt,
-            temperature: temperature,
-            candidate_count: candidate_count,
-            top_p: top_p,
-            top_k: top_k,
-        };
         let client = reqwest::blocking::Client::new();
         let mut res = client
             .post(format!(
@@ -446,11 +411,10 @@ impl PalmClient {
     pub fn chat(
         &self,
         model: String,
-        message_prompt: MessagePrompt,
-        config: HashMap<String, String>,
+        chat_body: ChatBody,
     ) -> Result<ChatRes, Box<dyn std::error::Error>> {
         let (res, body) = self
-            .post_chat_req(&model, message_prompt, config)
+            .post_chat_req(&model, chat_body)
             .expect("Error occured while sending POST request");
         match res.status() {
             reqwest::StatusCode::OK => {
@@ -544,7 +508,7 @@ impl PalmClient {
     }
 }
 
-pub fn new_message_prompt() -> MessagePrompt {
+fn new_message_prompt() -> MessagePrompt {
     let messages: Vec<Message> = Vec::new();
     let examples: Vec<Example> = Vec::new();
     MessagePrompt {
@@ -554,7 +518,22 @@ pub fn new_message_prompt() -> MessagePrompt {
     }
 }
 
-impl MessagePrompt {
+pub fn new_chat_body() -> ChatBody {
+    let prompt = new_message_prompt();
+    let temperature = -1.0;
+    let candidate_count = 1;
+    let top_p = -1.0;
+    let top_k = -1;
+    ChatBody {
+        prompt: prompt,
+        temperature: temperature,
+        candidate_count: candidate_count,
+        top_p: top_p,
+        top_k: top_k,
+    }
+}
+
+impl ChatBody {
     pub fn append_example(&mut self, input: String, output: String) {
         let in_message = Message { content: input };
         let out_message = Message { content: output };
@@ -562,16 +541,32 @@ impl MessagePrompt {
             input: in_message,
             output: out_message,
         };
-        self.examples.push(example);
+        self.prompt.examples.push(example);
     }
 
     pub fn append_message(&mut self, content: String) {
         let message = Message { content: content };
-        self.messages.push(message);
+        self.prompt.messages.push(message);
     }
 
     pub fn set_context(&mut self, context: String) {
-        self.context = context;
+        self.prompt.context = context;
+    }
+
+    pub fn set_temperature(&mut self, temperature: f64) {
+        self.temperature = temperature;
+    }
+
+    pub fn set_candidate_count(&mut self, candidate_count: u32) {
+        self.candidate_count = candidate_count;
+    }
+
+    pub fn set_top_p(&mut self, top_p: f64) {
+        self.top_p = top_p;
+    }
+
+    pub fn set_top_k(&mut self, top_k: i32) {
+        self.top_k = top_k;
     }
 }
 
