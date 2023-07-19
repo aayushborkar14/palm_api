@@ -27,7 +27,7 @@ pub struct Model {
     pub supported_generation_methods: Vec<String>,
     pub temperature: Option<f64>,
     pub top_p: Option<f64>,
-    pub top_k: Option<u32>,
+    pub top_k: Option<i32>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -78,7 +78,7 @@ struct ChatBody {
     temperature: f64,
     candidate_count: u32,
     top_p: f64,
-    top_k: u32,
+    top_k: i32,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -139,7 +139,7 @@ pub struct TextBody {
     candidate_count: u32,
     max_output_tokens: u32,
     top_p: f64,
-    top_k: u32,
+    top_k: i32,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -384,7 +384,7 @@ impl PalmClient {
         let temperature: f64;
         let candidate_count: u32;
         let top_p: f64;
-        let top_k: u32;
+        let top_k: i32;
         let model_info = self.get_model(model.to_string()).expect("err");
         if config.contains_key(&"temperature".to_string()) {
             temperature = match config["temperature"].trim().parse() {
@@ -484,11 +484,15 @@ impl PalmClient {
         let model_info = self.get_model(model.to_string()).expect("err");
         let temperature: f64 = model_info.temperature.unwrap();
         let top_p: f64 = model_info.top_p.unwrap();
+        let top_k: i32 = model_info.top_k.unwrap();
         if text_body.temperature == -1.0 {
             text_body.set_temperature(temperature);
         }
         if text_body.top_p == -1.0 {
             text_body.set_top_p(top_p);
+        }
+        if text_body.top_k == -1 {
+            text_body.set_top_k(top_k);
         }
         let client = reqwest::blocking::Client::new();
         let mut res = client
@@ -581,7 +585,7 @@ pub fn new_text_body() -> TextBody {
     let candidate_count = 1;
     let max_output_tokens = 64;
     let top_p = -1.0;
-    let top_k = 40;
+    let top_k = -1;
     TextBody {
         prompt: text_prompt,
         safety_settings: safety_settings,
@@ -626,7 +630,7 @@ impl TextBody {
         self.top_p = top_p;
     }
 
-    pub fn set_top_k(&mut self, top_k: u32) {
+    pub fn set_top_k(&mut self, top_k: i32) {
         self.top_k = top_k;
     }
 }
