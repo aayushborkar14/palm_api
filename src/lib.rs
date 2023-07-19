@@ -7,9 +7,7 @@ pub fn create_client(api_key: String) -> PalmClient {
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashMap;
-
-    use crate::palm::{new_message_prompt, new_text_body};
+    use crate::palm::{new_chat_body, new_text_body};
 
     use super::*;
 
@@ -59,22 +57,20 @@ mod tests {
     #[test]
     fn generate_message_works() {
         let my_client = create_client("".to_string());
-        let mut message_prompt = new_message_prompt();
-        message_prompt.append_example(
+        let mut chat_body = new_chat_body();
+        chat_body.append_example(
             "How are you doing?".to_string(),
             "I am doing absolutely fine!".to_string(),
         );
-        message_prompt.append_message("How are you doing?".to_string());
-        message_prompt.set_context("Reply in english".to_string());
-        let mut config: HashMap<String, String> = HashMap::new();
-        config.insert("temperature".to_string(), "0.8".to_string());
-        config.insert("top_p".to_string(), "0.56".to_string());
-        config.insert("candidate_count".to_string(), "2".to_string());
-        // config["top_k"];
+        chat_body.append_message("How are you doing?".to_string());
+        chat_body.set_context("Reply in english".to_string());
+        chat_body.set_temperature(0.8);
+        chat_body.set_top_p(0.56);
+        chat_body.set_candidate_count(2);
         let chat_res = my_client
-            .chat("chat-bison-001".to_string(), message_prompt, config)
+            .chat("chat-bison-001".to_string(), chat_body)
             .expect("err");
-        assert!(chat_res.candidates.unwrap().len() > 0);
+        assert_eq!(chat_res.candidates.unwrap().len(), 2);
     }
 
     #[test]
