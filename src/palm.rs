@@ -446,17 +446,14 @@ impl PalmClient {
         mut text_body: TextBody,
     ) -> Result<(reqwest::blocking::Response, String), Box<dyn std::error::Error>> {
         let model_info = self.get_model(model.to_string()).expect("err");
-        let temperature: f64 = model_info.temperature.unwrap();
-        let top_p: f64 = model_info.top_p.unwrap();
-        let top_k: i32 = model_info.top_k.unwrap();
         if text_body.temperature == -1.0 {
-            text_body.set_temperature(temperature);
+            text_body.set_temperature(model_info.temperature.unwrap());
         }
         if text_body.top_p == -1.0 {
-            text_body.set_top_p(top_p);
+            text_body.set_top_p(model_info.top_p.unwrap());
         }
         if text_body.top_k == -1 {
-            text_body.set_top_k(top_k);
+            text_body.set_top_k(model_info.top_k.unwrap());
         }
         let client = reqwest::blocking::Client::new();
         let mut res = client

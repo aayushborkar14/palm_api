@@ -7,9 +7,8 @@ pub fn create_client(api_key: String) -> PalmClient {
 
 #[cfg(test)]
 mod tests {
-    use crate::palm::{new_chat_body, new_text_body};
-
     use super::*;
+    use crate::palm::{new_chat_body, new_text_body};
 
     #[test]
     fn list_models_works() {
