@@ -76,4 +76,21 @@ mod tests {
             .expect("err");
         assert!(chat_res.candidates.unwrap().len() > 0);
     }
+
+    #[test]
+    fn generate_text_works() {
+        let my_client = create_client("".to_string());
+        let mut text_body = new_text_body();
+        text_body.append_safety_setting(
+            "HARM_CATEGORY_TOXICITY".to_string(),
+            "BLOCK_LOW_AND_ABOVE".to_string(),
+        );
+        text_body.set_candidate_count(2);
+        text_body.set_temperature(1.0);
+        text_body.set_text_prompt("Write a story about a magic backpack.".to_string());
+        let text_res = my_client
+            .generate_text("text-bison-001".to_string(), text_body)
+            .expect("err");
+        assert_eq!(text_res.candidates.unwrap().len(), 2);
+    }
 }
