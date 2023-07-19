@@ -3,11 +3,23 @@ use std::io::Read;
 
 const ENDPOINT: &str = "https://generativelanguage.googleapis.com";
 
+/// A client configured with a PaLM API key and an API endpoint
 pub struct PalmClient {
     api_key: String,
     endpoint: String,
 }
 
+/// Creates a PalmClient
+///
+/// # Arguments
+///
+/// * `api_key` - A string that holds the PaLM API key from Google
+///
+/// # Example
+/// ```
+/// const API_KEY: &str = "api key here";
+/// let client = palm_api::palm::create_client(API_KEY.to_string());
+/// ```
 pub fn create_client(api_key: String) -> PalmClient {
     PalmClient {
         api_key: api_key,
@@ -15,18 +27,45 @@ pub fn create_client(api_key: String) -> PalmClient {
     }
 }
 
+/// Information about any model
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Model {
+    /// Required. The resource name of the Model
+    ///
+    /// # Format
+    /// models/{model} with a {model} naming convention of "{baseModelId}-{version}"
+    ///
+    /// # Example
+    /// models/chat-bison-001
     pub name: String,
+    /// Required. The version number of the model
+    /// This represents the major version
     pub version: String,
+    /// The human-readable name of the model. E.g. "Chat Bison"
+    /// The name can be up to 128 characters long and can consist of any UTF-8 characters
     pub display_name: String,
+    /// A short description of the model
     pub description: String,
+    /// Maximum number of input tokens allowed for this model
     pub input_token_limit: u32,
+    /// Maximum number of output tokens available for this model
     pub output_token_limit: u32,
+    /// The model's supported generation methods
+    /// The method names are defined as Pascal case strings, such as generateMessage which correspond to API methods
     pub supported_generation_methods: Vec<String>,
+    /// Controls the randomness of the output
+    /// Values can range over [0.0,1.0], inclusive
+    /// A value closer to 1.0 will produce responses that are more varied, while a value closer to 0.0 will typically result in less surprising responses from the model
+    /// This value specifies default to be used by the backend while making the call to the model
     pub temperature: Option<f64>,
+    /// For Nucleus sampling
+    /// Nucleus sampling considers the smallest set of tokens whose probability sum is at least topP
+    /// This value specifies default to be used by the backend while making the call to the model
     pub top_p: Option<f64>,
+    /// For Top-k sampling
+    /// Top-k sampling considers the set of topK most probable tokens
+    /// This value specifies default to be used by the backend while making the call to the model
     pub top_k: Option<i32>,
 }
 
@@ -71,6 +110,7 @@ struct EmbedValue {
     value: Vec<f64>,
 }
 
+/// JSON Payload for POST request required to generate message (chat)
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct ChatBody {
@@ -94,28 +134,30 @@ struct MessagePrompt {
     messages: Vec<Message>,
 }
 
+/// Content filtering metadata associated with processing a single request
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ContentFilter {
+    /// The reason content was blocked during request processing
     pub reason: String,
 }
 
+/// Message response to generate message (chat)
 #[derive(Serialize, Deserialize, Debug)]
 pub struct MessageRes {
+    /// Optional. The author of this Message
+    /// This serves as a key for tagging the content of this Message when it is fed to the model as text
+    /// The author can be any alphanumeric string
     pub author: String,
+    /// Required. The text content of the structured Message
     pub content: String,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Candidate {
-    pub author: String,
-    pub content: String,
-}
-
+// Response to generate message (chat)
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ChatRes {
     pub messages: Vec<MessageRes>,
     pub filters: Option<Vec<ContentFilter>>,
-    pub candidates: Option<Vec<Candidate>>,
+    pub candidates: Option<Vec<MessageRes>>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

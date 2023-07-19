@@ -1,14 +1,9 @@
 pub mod palm;
 pub use palm::PalmClient;
 
-pub fn create_client(api_key: String) -> PalmClient {
-    palm::create_client(api_key)
-}
-
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::palm::{new_chat_body, new_text_body};
+    use crate::palm::{new_chat_body, new_text_body, create_client};
 
     #[test]
     fn list_models_works() {
