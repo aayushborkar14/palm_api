@@ -294,6 +294,17 @@ impl PalmClient {
         Ok(parsed_models)
     }
 
+    /// Lists models available through the API
+    ///
+    /// # Example
+    /// ```
+    /// const API_KEY: &str = "";
+    /// let client = palm_api::palm::create_client(API_KEY.to_string());
+    /// let model_list = client.list_models().expect("err");
+    /// for model in model_list {
+    ///     println!("{}",model.name);
+    /// }
+    /// ```
     pub fn list_models(&self) -> Result<Vec<Model>, Box<dyn std::error::Error>> {
         let (res, body) = self
             .fetch_models()
@@ -334,6 +345,15 @@ impl PalmClient {
         Ok(parsed_model)
     }
 
+    /// Gets information about a specific Model
+    ///
+    /// # Example
+    /// ```
+    /// const API_KEY: &str = "";
+    /// let client = palm_api::palm::create_client(API_KEY.to_string());
+    /// let model = client.get_model("text-bison-001".to_string()).expect("err");
+    /// println!("{}",model.description);
+    /// ```
     pub fn get_model(&self, model: String) -> Result<Model, Box<dyn std::error::Error>> {
         let (res, body) = self
             .fetch_model(&model)
@@ -393,6 +413,15 @@ impl PalmClient {
         Ok(parsed_token)
     }
 
+    /// Runs a model's tokenizer on a string and returns the token count
+    ///
+    /// # Example
+    /// ```
+    /// const API_KEY: &str = "";
+    /// let client = palm_api::palm::create_client(API_KEY.to_string());
+    /// let token_count = client.count_message_tokens("chat-bison-001".to_string(),vec!["How many tokens?".to_string(), "For this whole conversation?".to_string()]).expect("err");
+    /// println!("{}",token_count);
+    /// ```
     pub fn count_message_tokens(
         &self,
         model: String,
@@ -449,6 +478,17 @@ impl PalmClient {
         Ok(parsed_embeddings)
     }
 
+    /// Generates an embedding from the model given an input message
+    ///
+    /// # Example
+    /// ```
+    /// const API_KEY: &str = "";
+    /// let client = palm_api::palm::create_client(API_KEY.to_string());
+    /// let embeddings = client.generate_embeddings("embedding-gecko-001".to_string(),"say something nice!".to_string()).expect("err");
+    /// for embed_value in embeddings {
+    ///     print!("{}, ",embed_value);
+    /// }
+    /// ```
     pub fn generate_embeddings(
         &self,
         model: String,
