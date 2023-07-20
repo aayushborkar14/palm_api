@@ -210,28 +210,68 @@ pub struct TextBody {
 /// Content is classified for safety across a number of harm categories and the probability of the harm classification is included here
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SafetyRating {
+    /// Required. The category for this rating
     pub category: String,
+    /// Required. The probability of harm for this content
     pub probability: String,
 }
 
+/// Output text returned from a model
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct TextCompletion {
+    /// The generated text returned from the model
     pub output: String,
+    /// Ratings for the safety of a response
+    /// There is at most one rating per category
     pub safety_ratings: Vec<SafetyRating>,
 }
 
+/// Safety feedback for an entire request
+/// This field is populated if content in the input and/or response is blocked due to safety settings
+/// SafetyFeedback may not exist for every HarmCategory
+/// Each SafetyFeedback will return the safety settings used by the request as well as the lowest HarmProbability that should be allowed in order to return a result
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SafetyFeedback {
+    /// Safety rating evaluated from content
     pub rating: SafetyRating,
+    /// Safety settings applied to the request
     pub setting: SafetySetting,
 }
 
+/// The response from the model, including candidate completions
+///
+/// # Example
+/// ```
+/// let text_res = client.generate_text("text-bison-001".to_string(),text_body).expect("err");
+/// ```
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct TextRes {
+    /// Candidate responses from the model
+    ///
+    /// # Example
+    /// ```
+    /// println!("{}",text_res.candidates.unwrap()[0].output);
+    /// ```
     pub candidates: Option<Vec<TextCompletion>>,
+    /// A set of content filtering metadata for the prompt and response text
+    /// This indicates which SafetyCategory(s) blocked a candidate from this response, the lowest HarmProbability that triggered a block, and the HarmThreshold setting for that category
+    /// This indicates the smallest change to the SafetySettings that would be necessary to unblock at least 1 response
+    ///
+    /// The blocking is configured by the SafetySettings in the request (or the default SafetySettings of the API)
+    ///
+    /// # Example
+    /// ```
+    /// println!("{}",text_res.filters.unwrap()[0].reason);
+    /// ```
     pub filters: Option<Vec<ContentFilter>>,
+    /// Returns any safety feedback related to content filtering
+    ///
+    /// # Example
+    /// ```
+    /// println!("{}",text_res.safety_feedback.unwrap()[0].rating);
+    /// ```
     pub safety_feedback: Option<Vec<SafetyFeedback>>,
 }
 
