@@ -155,8 +155,24 @@ pub struct MessageRes {
 // Response to generate message (chat)
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ChatRes {
+    /// The conversation history used by the model
     pub messages: Vec<MessageRes>,
+    /// A set of content filtering metadata for the prompt and response text
+    /// This indicates which SafetyCategory(s) blocked a candidate from this response, the lowest HarmProbability that triggered a block, and the HarmThreshold setting for that category
+    /// This indicates the smallest change to the SafetySettings that would be necessary to unblock at least 1 response
+    /// The blocking is configured by the SafetySettings in the request (or the default SafetySettings of the API)
+    ///
+    /// # Example
+    /// ```
+    /// println!("{}",chat_res.filters.unwrap()[0].reason);
+    /// ```
     pub filters: Option<Vec<ContentFilter>>,
+    /// Candidate response messages from the model
+    ///
+    /// # Example
+    /// ```
+    /// println!("{}",chat_res.candidates.unwrap()[0].content);
+    /// ```
     pub candidates: Option<Vec<MessageRes>>,
 }
 
@@ -165,12 +181,17 @@ struct TextPrompt {
     text: String,
 }
 
+/// Safety setting, affecting the safety-blocking behavior
+/// Passing a safety setting for a category changes the allowed proability that content is blocked
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SafetySetting {
+    /// Required. The category for this setting
     pub category: String,
+    /// Required. Controls the probability threshold at which harm is blocked
     pub threshold: String,
 }
 
+/// The request body for generate_text() function
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct TextBody {
@@ -184,6 +205,9 @@ pub struct TextBody {
     top_k: i32,
 }
 
+/// Safety rating for a piece of content
+/// The safety rating contains the category of harm and the harm probability level in that category for a piece of content
+/// Content is classified for safety across a number of harm categories and the probability of the harm classification is included here
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SafetyRating {
     pub category: String,
