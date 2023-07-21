@@ -554,6 +554,27 @@ impl PalmClient {
         Ok(parsed_chat)
     }
 
+    /// Generates a response from the model given an input ChatBody
+    ///
+    /// # Example
+    /// ```
+    /// const API_KEY: &str = "";
+    /// let client = palm_api::palm::create_client(API_KEY.to_string());
+    /// let mut chat_body = palm_api::palm::new_chat_body();
+    /// chat_body.append_message("How are you doing?".to_string());
+    /// chat_body.append_example(
+    ///     "How are you doing?".to_string(),
+    ///     "I am doing absolutely fine!".to_string(),
+    /// );
+    /// chat_body.set_context("Reply in english".to_string());
+    /// chat_body.set_temperature(0.8);
+    /// chat_body.set_top_p(0.56);
+    /// chat_body.set_candidate_count(2);
+    /// let chat_res = client
+    ///     .chat("chat-bison-001".to_string(), chat_body)
+    ///     .expect("err");
+    /// println!("{}",chat_res.candidates.unwrap()[1].content);
+    /// ```
     pub fn chat(
         &self,
         model: String,
