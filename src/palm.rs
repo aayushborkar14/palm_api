@@ -347,6 +347,9 @@ impl PalmClient {
 
     /// Gets information about a specific Model
     ///
+    /// # Arguments
+    /// * `model` - The resource name of the model
+    ///
     /// # Example
     /// ```
     /// const API_KEY: &str = "";
@@ -415,6 +418,10 @@ impl PalmClient {
 
     /// Runs a model's tokenizer on a string and returns the token count
     ///
+    /// # Arguments
+    /// * `model` - The resource name of the model
+    /// * `message_list` - A vector of text that should be provided to the model first
+    ///
     /// # Example
     /// ```
     /// const API_KEY: &str = "";
@@ -479,6 +486,10 @@ impl PalmClient {
     }
 
     /// Generates an embedding from the model given an input message
+    ///
+    /// # Arguments
+    /// * `model` - The resource name of the model
+    /// * `text` - The free-form input text that the model will turn into an embedding
     ///
     /// # Example
     /// ```
@@ -555,6 +566,10 @@ impl PalmClient {
     }
 
     /// Generates a response from the model given an input ChatBody
+    ///
+    /// # Arguments
+    /// * `model` - The resource name of the model
+    /// * `chat_body` - A `ChatBody` struct to be provided to the model first
     ///
     /// # Example
     /// ```
@@ -641,6 +656,10 @@ impl PalmClient {
     }
 
     /// Generates a response from the model given an input message
+    ///
+    /// # Arguments
+    /// * `model` - The resource name of the model
+    /// * `text_body` - A `TextBody` struct to be provided to the model first
     ///
     /// # Example
     /// ```
