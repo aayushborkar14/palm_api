@@ -640,6 +640,25 @@ impl PalmClient {
         Ok(parsed_text)
     }
 
+    /// Generates a response from the model given an input message
+    ///
+    /// # Example
+    /// ```
+    /// const API_KEY: &str = "";
+    /// let client = palm_api::palm::create_client(API_KEY.to_string());
+    /// let mut text_body = palm_api::palm::new_text_body();
+    /// text_body.append_safety_setting(
+    ///     "HARM_CATEGORY_TOXICITY".to_string(),
+    ///     "BLOCK_LOW_AND_ABOVE".to_string(),
+    /// );
+    /// text_body.set_candidate_count(2);
+    /// text_body.set_temperature(1.0);
+    /// text_body.set_text_prompt("Write a story about a magic backpack.".to_string());
+    /// let text_res = client
+    ///     .generate_text("text-bison-001".to_string(), text_body)
+    ///     .expect("err");
+    /// println!("{}",text_res.candidates.unwrap()[1].output);
+    /// ```
     pub fn generate_text(
         &self,
         model: String,
