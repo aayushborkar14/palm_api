@@ -719,7 +719,16 @@ fn new_message_prompt() -> MessagePrompt {
         examples: examples,
     }
 }
-
+/// Creates a ChatBody struct
+///
+/// # Available methods
+/// * `append_example`
+/// * `append_message`
+/// * `set_context`
+/// * `set_temperature`
+/// * `set_candidate_count`
+/// * `set_top_p`
+/// * `set_top_k`
 pub fn new_chat_body() -> ChatBody {
     let prompt = new_message_prompt();
     let temperature = -1.0;
@@ -736,6 +745,11 @@ pub fn new_chat_body() -> ChatBody {
 }
 
 impl ChatBody {
+    /// Appends an example to the existing list of examples
+    ///
+    /// # Arguments
+    /// * `input` - An example of an input Message from the user
+    /// * `output` - An example of what the model should output given the input
     pub fn append_example(&mut self, input: String, output: String) {
         let in_message = Message { content: input };
         let out_message = Message { content: output };
@@ -746,32 +760,72 @@ impl ChatBody {
         self.prompt.examples.push(example);
     }
 
+    /// Appends an messafe to the existing list of messages
+    ///
+    /// # Arguments
+    /// * `content` - The text content of the structured Message
     pub fn append_message(&mut self, content: String) {
         let message = Message { content: content };
         self.prompt.messages.push(message);
     }
 
+    /// Sets context
+    ///
+    /// # Arguments
+    /// * `context` - Text that should be provided to the model first to ground the response
     pub fn set_context(&mut self, context: String) {
         self.prompt.context = context;
     }
 
+    /// Sets the temperature to be used by the model
+    /// Defaults to model value
+    ///
+    /// # Arguments
+    /// * `temperature` - Controls the randomness of the output
     pub fn set_temperature(&mut self, temperature: f64) {
         self.temperature = temperature;
     }
 
+    /// Sets the candidate count
+    /// Value between [1,8] inclusive
+    /// Defaults to 1
+    ///
+    /// # Arguments
+    /// * `candidate_count` - The number of generated response messages to return
     pub fn set_candidate_count(&mut self, candidate_count: u32) {
         self.candidate_count = candidate_count;
     }
 
+    /// Sets the top_p value to be used by the model
+    /// Defaults to model value
+    ///
+    /// # Arguments
+    /// * `top_p` - The maximum cumulative probability of tokens to consider when sampling
     pub fn set_top_p(&mut self, top_p: f64) {
         self.top_p = top_p;
     }
 
+    /// Sets the top_k value to be used by the model
+    /// Defaults to model value
+    ///
+    /// # Arguments
+    /// * `top_k` - The maximum number of tokens to consider when sampling
     pub fn set_top_k(&mut self, top_k: i32) {
         self.top_k = top_k;
     }
 }
 
+/// Creates a TextBody struct
+///
+/// # Available methods
+/// * `set_text_prompt`
+/// * `append_safety_setting`
+/// * `append_stop_sequence`
+/// * `set_temperature`
+/// * `set_candidate_count`
+/// * `set_max_output_tokens`
+/// * `set_top_p`
+/// * `set_top_k`
 pub fn new_text_body() -> TextBody {
     let text_prompt = TextPrompt {
         text: "".to_string(),
@@ -796,10 +850,21 @@ pub fn new_text_body() -> TextBody {
 }
 
 impl TextBody {
+    /// Set the free-form input text given to the model as a prompt
+    ///
+    /// # Arguments
+    /// * `text` - The prompt text
     pub fn set_text_prompt(&mut self, text: String) {
         self.prompt.text = text;
     }
 
+    /// Append a unique SafetySetting instance for blocking unsafe content
+    ///
+    /// # Arguments
+    /// * `category` - These categories cover various kinds of harms that developers may wish to adjust,
+    /// `category` can have the following values: HARM_CATEGORY_UNSPECIFIED, HARM_CATEGORY_DEROGATORY, HARM_CATEGORY_TOXICITY, HARM_CATEGORY_VIOLENCE, HARM_CATEGORY_SEXUAL, HARM_CATEGORY_MEDICAL, HARM_CATEGORY_DANGEROUS
+    /// * `threshold` - Block at and beyond a specified harm probability
+    /// `threshold` can have the following values: HARM_BLOCK_THRESHOLD_UNSPECIFIED, BLOCK_LOW_AND_ABOVE, BLOCK_MEDIUM_AND_ABOVE, BLOCK_ONLY_HIGH, BLOCK_NONE
     pub fn append_safety_setting(&mut self, category: String, threshold: String) {
         self.safety_settings.push(SafetySetting {
             category: category,
@@ -807,26 +872,58 @@ impl TextBody {
         });
     }
 
+    /// Append a stop sequence
+    /// Upto 5 stop sequences can be appended
+    /// If specified, the API will stop at the first appearance of a stop sequence
+    /// The stop sequence will not be included as part of the response
+    ///
+    /// `stop_sequence` - A character sequence that will stop output generation
     pub fn append_stop_sequence(&mut self, stop_sequence: String) {
         self.stop_sequences.push(stop_sequence);
     }
 
+    /// Sets the temperature to be used by the model
+    /// Defaults to model value
+    ///
+    /// # Arguments
+    /// * `temperature` - Controls the randomness of the output
     pub fn set_temperature(&mut self, temperature: f64) {
         self.temperature = temperature;
     }
 
+    /// Sets the candidate count
+    /// Value between [1,8] inclusive
+    /// Defaults to 1
+    ///
+    /// # Arguments
+    /// * `candidate_count` - Number of generated responses to return
     pub fn set_candidate_count(&mut self, candidate_count: u32) {
         self.candidate_count = candidate_count;
     }
 
+    /// Sets the max_output_tokens value to be used by model
+    /// Defaults to 64
+    ///
+    /// # Arguments
+    /// * `max_output_tokens` - The maximum number of tokens to include in a candidate
     pub fn set_max_output_tokens(&mut self, max_output_tokens: u32) {
         self.max_output_tokens = max_output_tokens;
     }
 
+    /// Sets the top_p value to be used by the model
+    /// Defaults to model value
+    ///
+    /// # Arguments
+    /// * `top_p` - The maximum cumulative probability of tokens to consider when sampling
     pub fn set_top_p(&mut self, top_p: f64) {
         self.top_p = top_p;
     }
 
+    /// Sets the top_k value to be used by the model
+    /// Defaults to model value
+    ///
+    /// # Arguments
+    /// * `top_k` - The maximum number of tokens to consider when sampling
     pub fn set_top_k(&mut self, top_k: i32) {
         self.top_k = top_k;
     }
