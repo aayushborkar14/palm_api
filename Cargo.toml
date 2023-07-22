@@ -2,8 +2,19 @@
 name = "palm_api"
 version = "0.1.0"
 edition = "2021"
+authors = ["Aayush Borkar <aayushb14@gmail.com>"]
+description = "Client library for Google's large language model PaLM API"
+readme = "README.md"
+repository = "https://github.com/aayushborkar14/palm_api"
+license = "MIT OR Apache-2.0"
+keywords = ["google", "generate-ai", "palm", "api", "llm"]
+categories = ["api-bindings"]
+build = false
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[badges]
+maintenance = { status = "actively-developed" }
 
 [dependencies]
 reqwest = { version = "0.11.18", features = ['blocking','json'] }
