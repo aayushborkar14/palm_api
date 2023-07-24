@@ -1,3 +1,36 @@
+//! # palm_api
+//!
+//! The palm_api crate provides a wrapper for Google's large language model PaLM API
+//!
+//! ## Generating text
+//! Use `PalmClient`'s `generate_text()` method to have the model complete some initial text.
+//! ```rust
+//! use palm_api::palm::{create_client, new_text_body};
+//!
+//! let client = create_client(API_KEY.to_string());
+//! let mut text_body = new_text_body();
+//! text_body.set_text_prompt("The opposite of hot is".to_string());
+//! let response = client.
+//!     .generate_text("text-bison-001".to_string(), text_body)
+//!     .expect("An error has occured.");
+//! println!("{}", response.candidates.unwrap()[0].output);
+//! ```
+//!
+//! ## Generating message
+//! Use `PalmClient`'s `chat()` method to have a discussion with a model.
+//! ```rust
+//! use palm_api::palm::{create_client, new_chat_body};
+//!
+//! let client = create_client(API_KEY.to_string());
+//! let mut chat_body = new_chat_body();
+//! chat_body.append_message("Hello.".to_string());
+//! let response = client
+//!     .chat("chat-bison-001".to_string(), chat_body)
+//!     .expect("An error has occured.");
+//! println!("{}", response.candidates.unwrap()[0].content);
+//! ```
+//!
+
 pub mod palm;
 
 #[cfg(test)]
