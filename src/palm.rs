@@ -3,13 +3,13 @@ use std::io::Read;
 
 const ENDPOINT: &str = "https://generativelanguage.googleapis.com";
 
-/// A client configured with a PaLM API key and an API endpoint
+/// A client configured with a PaLM API key and an API endpoint.
 pub struct PalmClient {
     api_key: String,
     endpoint: String,
 }
 
-/// Creates a PalmClient
+/// Creates a PalmClient.
 ///
 /// # Arguments
 ///
@@ -27,11 +27,11 @@ pub fn create_client(api_key: String) -> PalmClient {
     }
 }
 
-/// Information about any model
+/// Information about any model.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Model {
-    /// Required. The resource name of the Model
+    /// Required. The resource name of the Model.
     ///
     /// # Format
     /// models/{model} with a {model} naming convention of "{baseModelId}-{version}"
@@ -39,33 +39,33 @@ pub struct Model {
     /// # Example
     /// models/chat-bison-001
     pub name: String,
-    /// Required. The version number of the model
-    /// This represents the major version
+    /// Required. The version number of the model.
+    /// This represents the major version.
     pub version: String,
-    /// The human-readable name of the model. E.g. "Chat Bison"
-    /// The name can be up to 128 characters long and can consist of any UTF-8 characters
+    /// The human-readable name of the model. E.g. "Chat Bison".
+    /// The name can be up to 128 characters long and can consist of any UTF-8 characters.
     pub display_name: String,
-    /// A short description of the model
+    /// A short description of the model.
     pub description: String,
-    /// Maximum number of input tokens allowed for this model
+    /// Maximum number of input tokens allowed for this model.
     pub input_token_limit: u32,
-    /// Maximum number of output tokens available for this model
+    /// Maximum number of output tokens available for this model.
     pub output_token_limit: u32,
-    /// The model's supported generation methods
-    /// The method names are defined as Pascal case strings, such as generateMessage which correspond to API methods
+    /// The model's supported generation methods.
+    /// The method names are defined as Pascal case strings, such as generateMessage which correspond to API methods.
     pub supported_generation_methods: Vec<String>,
-    /// Controls the randomness of the output
-    /// Values can range over [0.0,1.0], inclusive
-    /// A value closer to 1.0 will produce responses that are more varied, while a value closer to 0.0 will typically result in less surprising responses from the model
-    /// This value specifies default to be used by the backend while making the call to the model
+    /// Controls the randomness of the output.
+    /// Values can range over [0.0,1.0], inclusive.
+    /// A value closer to 1.0 will produce responses that are more varied, while a value closer to 0.0 will typically result in less surprising responses from the model.
+    /// This value specifies default to be used by the backend while making the call to the model.
     pub temperature: Option<f64>,
-    /// For Nucleus sampling
-    /// Nucleus sampling considers the smallest set of tokens whose probability sum is at least topP
-    /// This value specifies default to be used by the backend while making the call to the model
+    /// For Nucleus sampling.
+    /// Nucleus sampling considers the smallest set of tokens whose probability sum is at least topP.
+    /// This value specifies default to be used by the backend while making the call to the model.
     pub top_p: Option<f64>,
-    /// For Top-k sampling
-    /// Top-k sampling considers the set of topK most probable tokens
-    /// This value specifies default to be used by the backend while making the call to the model
+    /// For Top-k sampling.
+    /// Top-k sampling considers the set of topK most probable tokens.
+    /// This value specifies default to be used by the backend while making the call to the model.
     pub top_k: Option<i32>,
 }
 
@@ -110,7 +110,7 @@ struct EmbedValue {
     value: Vec<f64>,
 }
 
-/// JSON Payload for POST request required to generate message (chat)
+/// JSON Payload for POST request required to generate message (chat).
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct ChatBody {
@@ -134,40 +134,40 @@ struct MessagePrompt {
     messages: Vec<Message>,
 }
 
-/// Content filtering metadata associated with processing a single request
+/// Content filtering metadata associated with processing a single request.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ContentFilter {
-    /// The reason content was blocked during request processing
+    /// The reason content was blocked during request processing.
     pub reason: String,
 }
 
-/// Message response to generate message (chat)
+/// Message response to generate message (chat).
 #[derive(Serialize, Deserialize, Debug)]
 pub struct MessageRes {
-    /// Optional. The author of this Message
-    /// This serves as a key for tagging the content of this Message when it is fed to the model as text
-    /// The author can be any alphanumeric string
+    /// Optional. The author of this Message.
+    /// This serves as a key for tagging the content of this Message when it is fed to the model as text.
+    /// The author can be any alphanumeric string.
     pub author: String,
-    /// Required. The text content of the structured Message
+    /// Required. The text content of the structured Message.
     pub content: String,
 }
 
 // Response to generate message (chat)
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ChatRes {
-    /// The conversation history used by the model
+    /// The conversation history used by the model.
     pub messages: Vec<MessageRes>,
-    /// A set of content filtering metadata for the prompt and response text
-    /// This indicates which SafetyCategory(s) blocked a candidate from this response, the lowest HarmProbability that triggered a block, and the HarmThreshold setting for that category
-    /// This indicates the smallest change to the SafetySettings that would be necessary to unblock at least 1 response
-    /// The blocking is configured by the SafetySettings in the request (or the default SafetySettings of the API)
+    /// A set of content filtering metadata for the prompt and response text.
+    /// This indicates which SafetyCategory(s) blocked a candidate from this response, the lowest HarmProbability that triggered a block, and the HarmThreshold setting for that category.
+    /// This indicates the smallest change to the SafetySettings that would be necessary to unblock at least 1 response.
+    /// The blocking is configured by the SafetySettings in the request (or the default SafetySettings of the API).
     ///
     /// # Example
     /// ```
     /// println!("{}",chat_res.filters.unwrap()[0].reason);
     /// ```
     pub filters: Option<Vec<ContentFilter>>,
-    /// Candidate response messages from the model
+    /// Candidate response messages from the model.
     ///
     /// # Example
     /// ```
@@ -181,17 +181,17 @@ struct TextPrompt {
     text: String,
 }
 
-/// Safety setting, affecting the safety-blocking behavior
-/// Passing a safety setting for a category changes the allowed proability that content is blocked
+/// Safety setting, affecting the safety-blocking behavior.
+/// Passing a safety setting for a category changes the allowed proability that content is blocked.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SafetySetting {
-    /// Required. The category for this setting
+    /// Required. The category for this setting.
     pub category: String,
-    /// Required. Controls the probability threshold at which harm is blocked
+    /// Required. Controls the probability threshold at which harm is blocked.
     pub threshold: String,
 }
 
-/// The request body for generate_text() function
+/// The request body for generate_text() function.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct TextBody {
@@ -205,41 +205,41 @@ pub struct TextBody {
     top_k: i32,
 }
 
-/// Safety rating for a piece of content
-/// The safety rating contains the category of harm and the harm probability level in that category for a piece of content
-/// Content is classified for safety across a number of harm categories and the probability of the harm classification is included here
+/// Safety rating for a piece of content.
+/// The safety rating contains the category of harm and the harm probability level in that category for a piece of content.
+/// Content is classified for safety across a number of harm categories and the probability of the harm classification is included here.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SafetyRating {
-    /// Required. The category for this rating
+    /// Required. The category for this rating.
     pub category: String,
-    /// Required. The probability of harm for this content
+    /// Required. The probability of harm for this content.
     pub probability: String,
 }
 
-/// Output text returned from a model
+/// Output text returned from a model.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct TextCompletion {
-    /// The generated text returned from the model
+    /// The generated text returned from the model.
     pub output: String,
-    /// Ratings for the safety of a response
-    /// There is at most one rating per category
+    /// Ratings for the safety of a response.
+    /// There is at most one rating per category.
     pub safety_ratings: Vec<SafetyRating>,
 }
 
-/// Safety feedback for an entire request
-/// This field is populated if content in the input and/or response is blocked due to safety settings
-/// SafetyFeedback may not exist for every HarmCategory
-/// Each SafetyFeedback will return the safety settings used by the request as well as the lowest HarmProbability that should be allowed in order to return a result
+/// Safety feedback for an entire request.
+/// This field is populated if content in the input and/or response is blocked due to safety settings.
+/// SafetyFeedback may not exist for every HarmCategory.
+/// Each SafetyFeedback will return the safety settings used by the request as well as the lowest HarmProbability that should be allowed in order to return a result.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SafetyFeedback {
-    /// Safety rating evaluated from content
+    /// Safety rating evaluated from content.
     pub rating: SafetyRating,
-    /// Safety settings applied to the request
+    /// Safety settings applied to the request.
     pub setting: SafetySetting,
 }
 
-/// The response from the model, including candidate completions
+/// The response from the model, including candidate completions.
 ///
 /// # Example
 /// ```
@@ -248,25 +248,25 @@ pub struct SafetyFeedback {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct TextRes {
-    /// Candidate responses from the model
+    /// Candidate responses from the model.
     ///
     /// # Example
     /// ```
     /// println!("{}",text_res.candidates.unwrap()[0].output);
     /// ```
     pub candidates: Option<Vec<TextCompletion>>,
-    /// A set of content filtering metadata for the prompt and response text
-    /// This indicates which SafetyCategory(s) blocked a candidate from this response, the lowest HarmProbability that triggered a block, and the HarmThreshold setting for that category
-    /// This indicates the smallest change to the SafetySettings that would be necessary to unblock at least 1 response
+    /// A set of content filtering metadata for the prompt and response text.
+    /// This indicates which SafetyCategory(s) blocked a candidate from this response, the lowest HarmProbability that triggered a block, and the HarmThreshold setting for that category.
+    /// This indicates the smallest change to the SafetySettings that would be necessary to unblock at least 1 response.
     ///
-    /// The blocking is configured by the SafetySettings in the request (or the default SafetySettings of the API)
+    /// The blocking is configured by the SafetySettings in the request (or the default SafetySettings of the API).
     ///
     /// # Example
     /// ```
     /// println!("{}",text_res.filters.unwrap()[0].reason);
     /// ```
     pub filters: Option<Vec<ContentFilter>>,
-    /// Returns any safety feedback related to content filtering
+    /// Returns any safety feedback related to content filtering.
     ///
     /// # Example
     /// ```
@@ -294,7 +294,7 @@ impl PalmClient {
         Ok(parsed_models)
     }
 
-    /// Lists models available through the API
+    /// Lists models available through the API.
     ///
     /// # Example
     /// ```
@@ -345,7 +345,7 @@ impl PalmClient {
         Ok(parsed_model)
     }
 
-    /// Gets information about a specific Model
+    /// Gets information about a specific Model.
     ///
     /// # Arguments
     /// * `model` - The resource name of the model
@@ -416,7 +416,7 @@ impl PalmClient {
         Ok(parsed_token)
     }
 
-    /// Runs a model's tokenizer on a string and returns the token count
+    /// Runs a model's tokenizer on a string and returns the token count.
     ///
     /// # Arguments
     /// * `model` - The resource name of the model
@@ -485,7 +485,7 @@ impl PalmClient {
         Ok(parsed_embeddings)
     }
 
-    /// Generates an embedding from the model given an input message
+    /// Generates an embedding from the model given an input message.
     ///
     /// # Arguments
     /// * `model` - The resource name of the model
@@ -565,7 +565,7 @@ impl PalmClient {
         Ok(parsed_chat)
     }
 
-    /// Generates a response from the model given an input ChatBody
+    /// Generates a response from the model given an input ChatBody.
     ///
     /// # Arguments
     /// * `model` - The resource name of the model
@@ -655,7 +655,7 @@ impl PalmClient {
         Ok(parsed_text)
     }
 
-    /// Generates a response from the model given an input message
+    /// Generates a response from the model given an input message.
     ///
     /// # Arguments
     /// * `model` - The resource name of the model
@@ -719,7 +719,7 @@ fn new_message_prompt() -> MessagePrompt {
         examples: examples,
     }
 }
-/// Creates a ChatBody struct
+/// Creates a ChatBody struct.
 ///
 /// # Available methods
 /// * `append_example`
@@ -745,7 +745,7 @@ pub fn new_chat_body() -> ChatBody {
 }
 
 impl ChatBody {
-    /// Appends an example to the existing list of examples
+    /// Appends an example to the existing list of examples.
     ///
     /// # Arguments
     /// * `input` - An example of an input Message from the user
@@ -760,7 +760,7 @@ impl ChatBody {
         self.prompt.examples.push(example);
     }
 
-    /// Appends an messafe to the existing list of messages
+    /// Appends an messafe to the existing list of messages.
     ///
     /// # Arguments
     /// * `content` - The text content of the structured Message
@@ -769,7 +769,7 @@ impl ChatBody {
         self.prompt.messages.push(message);
     }
 
-    /// Sets context
+    /// Sets context.
     ///
     /// # Arguments
     /// * `context` - Text that should be provided to the model first to ground the response
@@ -777,8 +777,8 @@ impl ChatBody {
         self.prompt.context = context;
     }
 
-    /// Sets the temperature to be used by the model
-    /// Defaults to model value
+    /// Sets the temperature to be used by the model.
+    /// Defaults to model value.
     ///
     /// # Arguments
     /// * `temperature` - Controls the randomness of the output
@@ -786,9 +786,9 @@ impl ChatBody {
         self.temperature = temperature;
     }
 
-    /// Sets the candidate count
-    /// Value between [1,8] inclusive
-    /// Defaults to 1
+    /// Sets the candidate count.
+    /// Value between [1,8] inclusive.
+    /// Defaults to 1.
     ///
     /// # Arguments
     /// * `candidate_count` - The number of generated response messages to return
@@ -796,8 +796,8 @@ impl ChatBody {
         self.candidate_count = candidate_count;
     }
 
-    /// Sets the top_p value to be used by the model
-    /// Defaults to model value
+    /// Sets the top_p value to be used by the model.
+    /// Defaults to model value.
     ///
     /// # Arguments
     /// * `top_p` - The maximum cumulative probability of tokens to consider when sampling
@@ -805,8 +805,8 @@ impl ChatBody {
         self.top_p = top_p;
     }
 
-    /// Sets the top_k value to be used by the model
-    /// Defaults to model value
+    /// Sets the top_k value to be used by the model.
+    /// Defaults to model value.
     ///
     /// # Arguments
     /// * `top_k` - The maximum number of tokens to consider when sampling
@@ -815,7 +815,7 @@ impl ChatBody {
     }
 }
 
-/// Creates a TextBody struct
+/// Creates a TextBody struct.
 ///
 /// # Available methods
 /// * `set_text_prompt`
@@ -850,7 +850,7 @@ pub fn new_text_body() -> TextBody {
 }
 
 impl TextBody {
-    /// Set the free-form input text given to the model as a prompt
+    /// Set the free-form input text given to the model as a prompt.
     ///
     /// # Arguments
     /// * `text` - The prompt text
@@ -858,7 +858,7 @@ impl TextBody {
         self.prompt.text = text;
     }
 
-    /// Append a unique SafetySetting instance for blocking unsafe content
+    /// Append a unique SafetySetting instance for blocking unsafe content.
     ///
     /// # Arguments
     /// * `category` - These categories cover various kinds of harms that developers may wish to adjust,
@@ -872,18 +872,18 @@ impl TextBody {
         });
     }
 
-    /// Append a stop sequence
-    /// Upto 5 stop sequences can be appended
-    /// If specified, the API will stop at the first appearance of a stop sequence
-    /// The stop sequence will not be included as part of the response
+    /// Append a stop sequence.
+    /// Upto 5 stop sequences can be appended.
+    /// If specified, the API will stop at the first appearance of a stop sequence.
+    /// The stop sequence will not be included as part of the response.
     ///
     /// `stop_sequence` - A character sequence that will stop output generation
     pub fn append_stop_sequence(&mut self, stop_sequence: String) {
         self.stop_sequences.push(stop_sequence);
     }
 
-    /// Sets the temperature to be used by the model
-    /// Defaults to model value
+    /// Sets the temperature to be used by the model.
+    /// Defaults to model value.
     ///
     /// # Arguments
     /// * `temperature` - Controls the randomness of the output
@@ -891,9 +891,9 @@ impl TextBody {
         self.temperature = temperature;
     }
 
-    /// Sets the candidate count
-    /// Value between [1,8] inclusive
-    /// Defaults to 1
+    /// Sets the candidate count.
+    /// Value between [1,8] inclusive.
+    /// Defaults to 1.
     ///
     /// # Arguments
     /// * `candidate_count` - Number of generated responses to return
@@ -901,8 +901,8 @@ impl TextBody {
         self.candidate_count = candidate_count;
     }
 
-    /// Sets the max_output_tokens value to be used by model
-    /// Defaults to 64
+    /// Sets the max_output_tokens value to be used by model.
+    /// Defaults to 64.
     ///
     /// # Arguments
     /// * `max_output_tokens` - The maximum number of tokens to include in a candidate
@@ -910,8 +910,8 @@ impl TextBody {
         self.max_output_tokens = max_output_tokens;
     }
 
-    /// Sets the top_p value to be used by the model
-    /// Defaults to model value
+    /// Sets the top_p value to be used by the model.
+    /// Defaults to model value.
     ///
     /// # Arguments
     /// * `top_p` - The maximum cumulative probability of tokens to consider when sampling
@@ -919,8 +919,8 @@ impl TextBody {
         self.top_p = top_p;
     }
 
-    /// Sets the top_k value to be used by the model
-    /// Defaults to model value
+    /// Sets the top_k value to be used by the model.
+    /// Defaults to model value.
     ///
     /// # Arguments
     /// * `top_k` - The maximum number of tokens to consider when sampling
