@@ -21,7 +21,7 @@ use palm_api::palm::new_text_body;
 
 let mut text_body = new_text_body();
 text_body.set_text_prompt("The opposite of hot is".to_string());
-let response = client.
+let response = client
     .generate_text("text-bison-001".to_string(), text_body)
     .expect("An error has occured.");
 println!("{}", response.candidates.unwrap()[0].output);
