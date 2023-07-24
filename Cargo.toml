@@ -1,6 +1,6 @@
 [package]
 name = "palm_api"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Aayush Borkar <aayushb14@gmail.com>"]
 description = "Client library for Google's large language model PaLM API"
