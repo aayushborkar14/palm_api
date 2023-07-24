@@ -152,7 +152,8 @@ pub struct MessageRes {
     pub content: String,
 }
 
-// Response to generate message (chat)
+/// The response from the model.
+/// This includes candidate messages and conversation history in the form of chronologically-ordered messages.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ChatRes {
     /// The conversation history used by the model.
