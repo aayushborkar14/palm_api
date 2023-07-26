@@ -12,7 +12,7 @@ Get an [API key from MakerSuite](https://makersuite.google.com/app/apikey), then
 ```rust,no_run
 use palm_api::palm::create_client;
 
-client = create_client(PALM_API_KEY.to_string());
+let client = create_client(PALM_API_KEY.to_string());
 ```
 
 Use `PalmClient`'s `generate_text()` method to have the model complete some initial text.
@@ -36,7 +36,6 @@ chat_body.append_message("Hello.".to_string());
 let response = client
     .chat("chat-bison-001".to_string(), chat_body)
     .expect("An error has occured.");
-println!("{}", response.candidates.unwrap()[0].content);
 let response2 = client
     .reply(response, "What can you do?".to_string(), 0)
     .expect("An error has occured.");
