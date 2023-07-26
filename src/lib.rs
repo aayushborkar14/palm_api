@@ -16,7 +16,7 @@
 //! println!("{}", response.candidates.unwrap()[0].output);
 //! ```
 //!
-//! ## Generating message
+//! ## Generating message and replying to it
 //! Use `PalmClient`'s `chat()` method to have a discussion with a model.
 //! ```rust
 //! use palm_api::palm::{create_client, new_chat_body};
@@ -28,6 +28,10 @@
 //!     .chat("chat-bison-001".to_string(), chat_body)
 //!     .expect("An error has occured.");
 //! println!("{}", response.candidates.unwrap()[0].content);
+//! let response2 = client
+//!     .reply(response, "What can you do?".to_string(), 0)
+//!     .expect("An error has occured.");
+//! println!("{}", response2.candidates.unwrap()[0].content);
 //! ```
 //!
 
