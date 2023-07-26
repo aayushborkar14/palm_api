@@ -631,6 +631,37 @@ impl PalmClient {
         };
     }
 
+    /// Generates a response from the model given a previous response and a new message.
+    ///
+    /// # Arguments
+    /// * `previous_response` - The previous `ChatRes` to whom the reply is being made
+    /// * `reply_message` - The message to be sent to the previous response given by model
+    /// * `candidate_index` - The index of the candidate corresponding to the message. If `candidate_count` is not explicitly set (which defaults to 1), then set this value to 0
+    ///
+    /// # Note
+    /// * Sometimes, the model may return less candidates than specified in `candidate_count`. So, it is advised to either set `candidate_index` to 0 or check whether the candidate at `candidate_index` exists to avoid errors.
+    /// # Example
+    /// ```
+    /// const API_KEY: &str = "";
+    /// let client = palm_api::palm::create_client(API_KEY.to_string());
+    /// let mut chat_body = palm_api::palm::new_chat_body();
+    /// chat_body.append_message("How are you doing?".to_string());
+    /// chat_body.append_example(
+    ///     "How are you doing?".to_string(),
+    ///     "I am doing absolutely fine!".to_string(),
+    /// );
+    /// chat_body.set_context("Reply in english".to_string());
+    /// chat_body.set_temperature(0.8);
+    /// chat_body.set_top_p(0.56);
+    /// chat_body.set_candidate_count(2);
+    /// let chat_res = client
+    ///     .chat("chat-bison-001".to_string(), chat_body)
+    ///     .expect("err");
+    /// let chat_res_2 = client
+    ///     .reply(chat_res, "What can you do?".to_string(), 0)
+    ///     .expect("err");
+    /// println!("{}",chat_res_2.candidates.unwrap()[0].content);
+    /// ```
     pub fn reply(
         &self,
         previous_response: ChatRes,

@@ -36,6 +36,9 @@ chat_body.append_message("Hello.".to_string());
 let response = client
     .chat("chat-bison-001".to_string(), chat_body)
     .expect("An error has occured.");
-println!("{}", response.candidates.unwrap()[0].content);
+let response2 = client
+    .reply(response, "What can you do?".to_string(), 0)
+    .expect("An error has occured.");
+println!("{}", response2.candidates.unwrap()[0].content);
 ```
 
