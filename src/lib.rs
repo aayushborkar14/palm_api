@@ -96,7 +96,10 @@ mod tests {
         let chat_res = my_client
             .chat("chat-bison-001".to_string(), chat_body)
             .expect("err");
-        assert!(chat_res.candidates.unwrap().len() > 0);
+        let chat_res_2 = my_client
+            .reply(chat_res, "What can you do?".to_string(), 0)
+            .expect("err");
+        assert!(chat_res_2.candidates.unwrap().len() > 0);
     }
 
     #[test]
