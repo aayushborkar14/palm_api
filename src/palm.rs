@@ -175,6 +175,8 @@ pub struct ChatRes {
     /// println!("{}",chat_res.candidates.unwrap()[0].content);
     /// ```
     pub candidates: Option<Vec<MessageRes>>,
+    chat_body: Option<ChatBody>,
+    model: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -536,7 +538,7 @@ impl PalmClient {
     fn post_chat_req(
         &self,
         model: &String,
-        mut chat_body: ChatBody,
+        chat_body: &mut ChatBody,
     ) -> Result<(reqwest::blocking::Response, String), Box<dyn std::error::Error>> {
         let model_info = self.get_model(model.to_string()).expect("err");
         if chat_body.temperature == -1.0 {
@@ -561,8 +563,15 @@ impl PalmClient {
         Ok((res, body))
     }
 
-    fn parse_chat(&self, body: String) -> serde_json::Result<ChatRes> {
-        let parsed_chat = serde_json::from_str(&body.as_str())?;
+    fn parse_chat(
+        &self,
+        body: String,
+        chat_body: ChatBody,
+        model: &String,
+    ) -> serde_json::Result<ChatRes> {
+        let mut parsed_chat: ChatRes = serde_json::from_str(&body.as_str())?;
+        parsed_chat.chat_body = Some(chat_body);
+        parsed_chat.model = Some(model.to_string());
         Ok(parsed_chat)
     }
 
@@ -594,14 +603,14 @@ impl PalmClient {
     pub fn chat(
         &self,
         model: String,
-        chat_body: ChatBody,
+        mut chat_body: ChatBody,
     ) -> Result<ChatRes, Box<dyn std::error::Error>> {
         let (res, body) = self
-            .post_chat_req(&model, chat_body)
+            .post_chat_req(&model, &mut chat_body)
             .expect("Error occured while sending POST request");
         match res.status() {
             reqwest::StatusCode::OK => {
-                let parsed_chats = self.parse_chat(body)?;
+                let parsed_chats = self.parse_chat(body, chat_body, &model)?;
                 return Ok(parsed_chats);
             }
             reqwest::StatusCode::UNAUTHORIZED => {
@@ -620,6 +629,23 @@ impl PalmClient {
                 panic!("Something unexpected happened: {}", other)
             }
         };
+    }
+
+    pub fn reply(
+        &self,
+        previous_response: ChatRes,
+        reply_message: String,
+        candidate_index: usize,
+    ) -> Result<ChatRes, Box<dyn std::error::Error>> {
+        let mut chat_body = previous_response.chat_body.unwrap();
+        chat_body.append_message(
+            previous_response.candidates.unwrap()[candidate_index]
+                .content
+                .clone(),
+        );
+        chat_body.append_message(reply_message);
+        let model = previous_response.model.unwrap();
+        self.chat(model, chat_body)
     }
 
     // functions for generate_text
