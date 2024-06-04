@@ -17,10 +17,16 @@ build = false
 maintenance = { status = "actively-developed" }
 
 [dependencies]
-reqwest = { version = "0.12", features = ['blocking','json'], default-features = false }
+reqwest = { version = "0.12", features = [
+  'blocking',
+  'json',
+], default-features = false }
 serde_json = "1.0.102"
 serde = { version = "1.0.171", features = ["derive"] }
 
 [features]
 default = ['reqwest/default']
 rustls-tls = ['reqwest/rustls-tls']
+
+[lib]
+doctest = false
